@@ -61,6 +61,28 @@ class SdFile : public SdBaseFile, public Print {
    * If an error occurs or end of file is reached return -1.
    */  
   int read() {return SdBaseFile::read();}
+  
+  int read(int bytes) {
+  
+    byte buf[bytes];
+    
+    int bytesRead = read(buf,bytes);
+    
+    if(bytesRead != bytes) return -1;
+    
+    unsigned int returnValue = 0;
+    
+    for(int i=0;i<bytes;i++) {
+      
+      returnValue <<= 8;
+      returnValue += buf[i];
+      
+    }
+    
+    return returnValue;
+  
+  }
+  
   /** Read data from a file starting at the current position.
    *
    * \param[out] buf Pointer to the location that will receive the data.
@@ -81,6 +103,19 @@ class SdFile : public SdBaseFile, public Print {
   void clearWriteError() {SdBaseFile::clearWriteError();}
   size_t write(uint8_t b);
 
+  int write(int value,int bytes) {
+  
+    char buf[bytes];
+    
+    for(int i=1;i<=bytes;i++) {
+      buf[bytes-i] = value & 0xFF;
+      value >>= 8;
+    }
+    
+    return write(buf,bytes);
+  
+  }
+  
   int write(const char* str);
   /** Write data to an open file.
    *
